@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="cs">
 <head>
@@ -116,56 +117,6 @@
     }
     .fb svg{ width:18px; height:18px; opacity:.92; }
 
-    /* Hamburger tlačítko */
-.hamburger{
-  display:none;
-  flex-direction:column;
-  justify-content:center;
-  gap:4px;
-  width:40px;
-  height:40px;
-  border-radius:999px;
-  border:1px solid rgba(243,240,234,.16);
-  background:rgba(255,255,255,.02);
-  cursor:pointer;
-  padding:0;
-}
-
-.hamburger span{
-  width:18px;
-  height:2px;
-  background:rgba(243,240,234,.92);
-  display:block;
-  margin:0 auto;
-}
-
-    /* Mobilní menu – skryté, otevře se přes body.nav-open */
-.topbar nav{
-  position: fixed;
-  top: var(--topbarH);
-  left: 0;
-  right: 0;
-  z-index: 60;
-
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-
-  padding: 14px var(--padX) 18px;
-  gap: 10px;
-
-  background: rgba(7,6,8,.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(243,240,234,.12);
-
-  transform: translateY(-110%);
-  transition: transform .22s ease;
-}
-
-body.nav-open .topbar nav{
-  transform: translateY(0);
-}
-    
     .top-phone{
       position: absolute;
       left: 80px; /* jak daleko od FB */
@@ -585,13 +536,6 @@ body.nav-open .topbar nav{
       }
       .gallery{ gap: 10px; }
       .map{ height: 280px; }
-
-      .hamburger{
-  display:flex;
-  margin-left:auto;
-  position:absolute;
-  right:16px;
-}
 }
 .quote{
   background: #ffffff;
@@ -620,7 +564,7 @@ body.nav-open .topbar nav{
   height: 1px;
   background: rgba(17,17,17,.25);
 }
-    
+
 /* Lightbox (klik na fotku v galerii) */
 .lightbox{
   position: fixed;
@@ -735,13 +679,7 @@ body.nav-open .topbar nav{
 
   <a class="top-phone" href="tel:+420724422272">+420 724 422 272</a>
 
-<button class="hamburger" type="button" aria-label="Otevřít menu" aria-expanded="false" aria-controls="mobileNav">
-  <span></span>
-  <span></span>
-  <span></span>
-</button>
-
-<nav id="mobileNav" aria-label="Hlavní menu">
+      <nav aria-label="Hlavní menu">
         <a href="#home">Domů</a>
         <a href="#about">O nás</a>
         <a href="#price">Ceník</a>
@@ -1212,26 +1150,9 @@ body.nav-open .topbar nav{
     }
   }, { passive: true });
 })();
-
-    // Mobilní hamburger menu
-(() => {
-  const burger = document.querySelector(".hamburger");
-  const nav = document.getElementById("mobileNav");
-  if (!burger || !nav) return;
-
-  burger.addEventListener("click", () => {
-    const open = document.body.classList.toggle("nav-open");
-    burger.setAttribute("aria-expanded", open ? "true" : "false");
-    burger.setAttribute("aria-label", open ? "Zavřít menu" : "Otevřít menu");
-  });
-})();
   </script>
 
 </body>
 
 </html>
-
-
-
-
 
