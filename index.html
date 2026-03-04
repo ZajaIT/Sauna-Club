@@ -1356,49 +1356,48 @@ nav{
     mm.classList.contains('is-open') ? closeMenu() : openMenu();
   });
 
-  // Klik mimo panel zavře (overlay)
-  mm.addEventListener('click', (e) => {
-    if (e.target === mm) closeMenu();
-  });
-
-  // Klik na položku: nejdřív zavřít, pak scroll (po krátkém odemknutí scrollu)
-  menuLinks.forEach((a) => {
-  a.addEventListener('click', (e) => {
-    const hash = a.getAttribute('href');
-    if (!hash || hash === '#') return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    // 1) zavřít menu a odemknout scroll
+  // Jediný click handler pro celé mobile menu (delegace) – nejstabilnější na mobilech
+mm.addEventListener('click', (e) => {
+  // 1) klik na overlay mimo panel = zavřít
+  if (e.target === mm) {
     closeMenu();
+    return;
+  }
 
-    // 2) “tvrdé” nastavení hashe (spolehlivé na mobilech)
-    //    a pak vlastní scroll s offsetem topbaru
-    setTimeout(() => {
-      // nastav hash (nativní anchor navigace)
-      history.pushState(null, '', hash);
+  // 2) klik na odkaz v menu
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || !mm.contains(a)) return;
 
-      // a teď to přepočítáme přesně s topbar offsetem
-      if (hash === '#home') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
+  const hash = a.getAttribute('href');
+  if (!hash || hash === '#') return;
 
-      const el = document.querySelector(hash);
-      if (!el) return;
+  e.preventDefault();
 
-      const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
-      const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
+  // zavřít menu (vrátí overflow)
+  closeMenu();
 
-      // dvojité RAF = iOS/Safari často potřebuje “chvíli” po změně hashe
+  // až po zavření/odemknutí scrollu udělat smooth scroll
+  setTimeout(() => {
+    // změň URL bez skoku
+    history.pushState(null, '', hash);
+
+    if (hash === '#home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const el = document.querySelector(hash);
+    if (!el) return;
+
+    const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
+    const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
+
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        });
+        window.scrollTo({ top: y, behavior: 'smooth' });
       });
-    }, 80);
-  });
+    });
+  }, 120);
 });
 
   // Swipe zavření
@@ -1434,6 +1433,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
