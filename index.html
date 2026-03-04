@@ -1016,11 +1016,22 @@
   </footer>
 
   <script>
-  // Po reloadu vždy začít nahoře
-  window.addEventListener("load", () => {
+  // Vypnout obnovování scroll pozice po reloadu / návratu z historie
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+
+  const forceTop = () => {
     window.scrollTo(0, 0);
-    history.replaceState(null, "", window.location.pathname);
-  });
+    // vyčistí hash, ale nechá query string (?utm apod.)
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  };
+
+  // Po běžném načtení
+  window.addEventListener("load", forceTop);
+
+  // Po návratu z bfcache (Safari/Chrome někdy obnoví starý scroll)
+  window.addEventListener("pageshow", forceTop);
     
     // Rok ve footeru
     document.getElementById("year").textContent = new Date().getFullYear();
@@ -1143,3 +1154,4 @@
 </body>
 
 </html>
+
