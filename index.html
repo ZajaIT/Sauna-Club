@@ -689,6 +689,12 @@ nav{
   .mobile-break{
   display:block;
 }
+
+      .mm__panel a:active{
+  border-color: rgba(255,179,107,.45);
+  box-shadow: inset 0 0 0 1px rgba(255,179,107,.25);
+  background: rgba(255,255,255,.08);
+}
 }
 .quote{
   background: #ffffff;
@@ -1210,8 +1216,11 @@ nav{
     // Kliky řešíme jen pro desktop nav (mobilní menu má svůj vlastní handler níž)
 const navLinks = Array.from(document.querySelectorAll('nav a[href^="#"]:not([href="#"])'));
 
-// Pro zvýraznění aktivní položky chceme oba sety odkazů (nav i mobile menu)
-const allLinks = Array.from(document.querySelectorAll(
+const links = Array.from(document.querySelectorAll(
+  'nav a[href^="#"]:not([href="#"])'
+));
+
+    const activeLinks = Array.from(document.querySelectorAll(
   'nav a[href^="#"]:not([href="#"]), #mobileMenu a[href^="#"]:not([href="#"])'
 ));
 
@@ -1261,7 +1270,7 @@ window.addEventListener("load", setActive);
       for (const s of sections) {
         if (s.offsetTop <= y) current = s.id;
       }
-      links.forEach(a => {
+      activeLinks.forEach(a => {
   const isActive = a.getAttribute("href") === "#" + current;
   a.classList.toggle("is-active", isActive);
 });
@@ -1452,6 +1461,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
