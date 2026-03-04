@@ -1324,6 +1324,40 @@ nav{
     if (e.target === mm) close();
   });
 
+  // swipe zavření (mobil): doprava nebo nahoru
+let startX = 0;
+let startY = 0;
+
+panel.addEventListener('touchstart', (e) => {
+  const t = e.touches[0];
+  startX = t.clientX;
+  startY = t.clientY;
+}, { passive: true });
+
+panel.addEventListener('touchend', (e) => {
+  const t = e.changedTouches[0];
+  const endX = t.clientX;
+  const endY = t.clientY;
+
+  const dx = endX - startX; // + = doprava
+  const dy = endY - startY; // - = nahoru
+
+  // prahy (klidně pak doladíme)
+  const TH = 60;
+
+  // swipe doprava (zleva doprava)
+  if (dx > TH && Math.abs(dy) < 80) {
+    close();
+    return;
+  }
+
+  // swipe nahoru (zdola nahoru)
+  if (dy < -TH && Math.abs(dx) < 80) {
+    close();
+    return;
+  }
+}, { passive: true });
+
   // klik na odkaz zavře (a nechá tvůj smooth scroll dál fungovat)
   links.forEach(a => a.addEventListener('click', () => close()));
 
@@ -1338,6 +1372,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
