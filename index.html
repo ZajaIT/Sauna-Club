@@ -584,6 +584,14 @@
   gap: 14px;
 }
       .gallery{ gap: 10px; }
+
+      .gallery{
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.gallery .photo:first-child{
+  grid-column: 1 / -1;
+}
       .map{ height: 280px; }
 
       .hours .row span{
@@ -1474,6 +1482,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
