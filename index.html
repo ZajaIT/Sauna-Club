@@ -1345,22 +1345,24 @@ nav{
     document.body.style.overflow = '';
   };
 
-  const scrollToHashSmooth = (hash) => {
-    history.pushState(null, '', hash);
+ const scrollToHashSmooth = (hash) => {
 
-    if (hash === '#home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
+  history.pushState(null, '', hash);
 
-    const el = document.querySelector(hash);
-    if (!el) return;
+  if (hash === '#home') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
 
-    const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
-    const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
+  const el = document.querySelector(hash);
+  if (!el) return;
 
-    window.scrollTo({ top: y, behavior: 'smooth' });
-  };
+  el.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+
+};
 
   burger.addEventListener('click', () => {
     mm.classList.contains('is-open') ? closeMenu() : openMenu();
@@ -1409,6 +1411,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
