@@ -586,7 +586,19 @@ nav{
     border-radius: 2px;
     display: block;
     margin: 0 auto;
+    transition: transform .25s ease, opacity .2s ease;
   }
+      .burger.is-open span:nth-child(1){
+  transform: translateY(8px) rotate(45deg);
+}
+
+.burger.is-open span:nth-child(2){
+  opacity: 0;
+}
+
+.burger.is-open span:nth-child(3){
+  transform: translateY(-8px) rotate(-45deg);
+}
         /* Mobile menu overlay */
   .mm{
     position: fixed;
@@ -1279,6 +1291,7 @@ nav{
 
   const open = () => {
     mm.classList.add('is-open');
+    burger.classList.add('is-open');
     mm.setAttribute('aria-hidden', 'false');
     burger.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
@@ -1286,6 +1299,7 @@ nav{
 
   const close = () => {
     mm.classList.remove('is-open');
+    burger.classList.remove('is-open');
     mm.setAttribute('aria-hidden', 'true');
     burger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
@@ -1313,6 +1327,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
