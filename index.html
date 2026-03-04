@@ -582,6 +582,52 @@ nav{
     display: block;
     margin: 0 auto;
   }
+        /* Mobile menu overlay */
+  .mm{
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: none;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(8px);
+  }
+  .mm.is-open{ display: block; }
+
+  .mm__panel{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(320px, 86vw);
+    height: 100%;
+    padding: 18px 16px;
+    background: rgba(7,6,8,.92);
+    border-left: 1px solid rgba(243,240,234,.12);
+    box-shadow: 0 18px 60px rgba(0,0,0,.45);
+    display: grid;
+    align-content: start;
+    gap: 10px;
+  }
+
+  .mm__close{
+    justify-self: end;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid rgba(243,240,234,.16);
+    background: rgba(255,255,255,.02);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .mm__panel a{
+    padding: 12px 10px;
+    border-radius: 12px;
+    color: rgba(243,240,234,.92);
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(243,240,234,.10);
+  }
 }
 .quote{
   background: #ffffff;
@@ -741,6 +787,19 @@ nav{
       </nav>
     </div>
   </header>
+
+  <!-- MOBILE MENU -->
+<div class="mm" id="mobileMenu" aria-hidden="true">
+  <div class="mm__panel" role="dialog" aria-label="Menu">
+    <button class="mm__close" type="button" aria-label="Zavřít menu">×</button>
+    <a href="#home">Domů</a>
+    <a href="#about">O nás</a>
+    <a href="#price">Ceník</a>
+    <a href="#sauna">Vše o saunování</a>
+    <a href="#gallery">Galerie</a>
+    <a href="#contact">Kontakt</a>
+  </div>
+</div>
 
   <!-- HERO -->
   <main id="home" class="hero">
@@ -1202,11 +1261,54 @@ nav{
     }
   }, { passive: true });
 })();
+
+    // Mobile menu (hamburger)
+(() => {
+  const burger = document.querySelector('.burger');
+  const mm = document.getElementById('mobileMenu');
+  if (!burger || !mm) return;
+
+  const panel = mm.querySelector('.mm__panel');
+  const closeBtn = mm.querySelector('.mm__close');
+  const links = Array.from(mm.querySelectorAll('a[href^="#"]'));
+
+  const open = () => {
+    mm.classList.add('is-open');
+    mm.setAttribute('aria-hidden', 'false');
+    burger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const close = () => {
+    mm.classList.remove('is-open');
+    mm.setAttribute('aria-hidden', 'true');
+    burger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  };
+
+  burger.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+
+  // klik mimo panel zavře
+  mm.addEventListener('click', (e) => {
+    if (e.target === mm) close();
+  });
+
+  // klik na odkaz zavře (a nechá tvůj smooth scroll dál fungovat)
+  links.forEach(a => a.addEventListener('click', () => close()));
+
+  // ESC zavře
+  window.addEventListener('keydown', (e) => {
+    if (!mm.classList.contains('is-open')) return;
+    if (e.key === 'Escape') close();
+  });
+})();
   </script>
 
 </body>
 
 </html>
+
 
 
 
