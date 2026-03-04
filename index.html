@@ -1292,6 +1292,10 @@ nav{
   const closeBtn = mm.querySelector('.mm__close');
   const links = Array.from(mm.querySelectorAll('a[href^="#"]'));
 
+  if (closeBtn) {
+  closeBtn.addEventListener('click', close);
+}
+
   const open = () => {
   mm.classList.add('is-open');
   mm.setAttribute('aria-hidden', 'false');
@@ -1333,6 +1337,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
