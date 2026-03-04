@@ -430,13 +430,11 @@
       background: rgba(255,255,255,.02);
     }
     .photo img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      filter: saturate(1.03) contrast(1.05);
-      transform: scale(1.02);
-      transition: transform .35s ease, filter .35s ease;
-    }
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  filter: saturate(1.03) contrast(1.05);
+}
     .photo::after{
       content:"";
       position:absolute;
@@ -445,11 +443,7 @@
       opacity:.9;
       pointer-events:none;
     }
-    .photo:hover img{
-      transform: scale(1.08);
-      filter: saturate(1.06) contrast(1.08);
-    }
-
+    
     /* Kontakt */
     .contact{
       margin-top: 18px;
@@ -1486,6 +1480,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
