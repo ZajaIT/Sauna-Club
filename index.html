@@ -1084,8 +1084,6 @@ nav{
           </p>
         </details>
 
-        </details>
-
         <details>
           <summary>
             Malý tip na závěr
@@ -1390,30 +1388,36 @@ panel.addEventListener('touchend', (e) => {
   }
 }, { passive: true });
 
-  // klik na odkaz zavře (a nechá tvůj smooth scroll dál fungovat)
-  links.forEach(a => a.addEventListener('click', (e) => {
-  const id = a.getAttribute('href');
-  if (!id || id === '#') return;
+  // klik na odkaz v MOBILE menu: nejdřív zavřít, pak scroll s offsetem topbaru
+const scrollToTarget = (hash) => {
+  if (hash === '#home') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  const el = document.querySelector(hash);
+  if (!el) return;
+
+  const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
+  const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
+
+  window.scrollTo({ top: y, behavior: 'smooth' });
+};
+
+links.forEach(a => a.addEventListener('click', (e) => {
+  const hash = a.getAttribute('href');
+  if (!hash || hash === '#') return;
 
   e.preventDefault();
 
-  // 1) nejdřív zavřít (vrátí overflow)
+  // zavři menu (vrátí overflow)
   close();
 
-  // 2) až potom scroll (další frame)
-  requestAnimationFrame(() => {
-    if (id === '#home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      history.pushState(null, '', id);
-      return;
-    }
-
-    const el = document.querySelector(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      history.pushState(null, '', id);
-    }
-  });
+  // počkej malinko, ať mobile browser stihne "odemknout" scroll
+  setTimeout(() => {
+    scrollToTarget(hash);
+    history.pushState(null, '', hash);
+  }, 30);
 }));
 
   // ESC zavře
@@ -1427,6 +1431,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
