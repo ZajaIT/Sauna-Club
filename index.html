@@ -612,10 +612,10 @@ nav{
 
   .mm__panel{
     position: absolute;
-    top: 0;
+    top: var(--topbarH);
     right: 0;
     width: min(320px, 86vw);
-    height: 100%;
+    height: calc(100% - var(--topbarH));
     padding: 18px 16px;
     background: rgba(7,6,8,.92);
     border-left: 1px solid rgba(243,240,234,.12);
@@ -1333,6 +1333,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
