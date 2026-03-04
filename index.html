@@ -1314,9 +1314,7 @@ nav{
 
     // Mobile menu (hamburger) — MOBILE ONLY, desktop se nedotkne
 (() => {
-  const mq = window.matchMedia('(max-width: 640px)');
-  if (!mq.matches) return;
-
+  
   const burger = document.querySelector('.burger');
   const mm = document.getElementById('mobileMenu');
   if (!burger || !mm) return;
@@ -1436,6 +1434,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
