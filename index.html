@@ -522,10 +522,12 @@
   .hero__content{ padding: 82px 0; }
 
   .features__grid{
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  justify-items: center;
-}
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    justify-items: center;
+    width: 100%;
+  }
 
   .feature__icon{
     width: 60px;
@@ -1446,6 +1448,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
