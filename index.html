@@ -1205,6 +1205,9 @@ nav{
 
     links.forEach(a => {
   a.addEventListener("click", (e) => {
+        // Mobile menu odkazy řešíme zvlášť (kvůli overflow:hidden)
+    if (a.closest('#mobileMenu')) return;
+    
     const id = a.getAttribute("href");
     if (!id) return;
 
@@ -1388,7 +1391,30 @@ panel.addEventListener('touchend', (e) => {
 }, { passive: true });
 
   // klik na odkaz zavře (a nechá tvůj smooth scroll dál fungovat)
-  links.forEach(a => a.addEventListener('click', () => close()));
+  links.forEach(a => a.addEventListener('click', (e) => {
+  const id = a.getAttribute('href');
+  if (!id || id === '#') return;
+
+  e.preventDefault();
+
+  // 1) nejdřív zavřít (vrátí overflow)
+  close();
+
+  // 2) až potom scroll (další frame)
+  requestAnimationFrame(() => {
+    if (id === '#home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      history.pushState(null, '', id);
+      return;
+    }
+
+    const el = document.querySelector(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.pushState(null, '', id);
+    }
+  });
+}));
 
   // ESC zavře
   window.addEventListener('keydown', (e) => {
@@ -1401,6 +1427,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
