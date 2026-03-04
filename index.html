@@ -36,10 +36,6 @@
     }
 
     *{ box-sizing:border-box; }
-
-    html{
-  scroll-behavior: smooth;
-}
     html,body{ height:100%; }
     body{
       margin:0;
@@ -269,14 +265,13 @@
     .btn svg{ width:16px; height:16px; opacity:.95; }
 
     /* Sections */
-     section,
-main{
-  position: relative;
-  padding: var(--padY) 0;
-  background: #ffffff;
-  color: #111111;
-  scroll-margin-top: 70px;
-}
+     section{
+      position: relative;
+      padding: var(--padY) 0;
+      background: #ffffff;
+      color: #111111;
+      scroll-margin-top: 70px;
+    }
 
 #hours,
 #price{
@@ -649,9 +644,8 @@ nav{
     transform: translateX(100%);
     transition: transform .28s ease;
     will-change: transform;
-    pointer-events: auto;
   }
-  
+
     .mm.is-open .mm__panel{
     transform: translateX(0);
   }
@@ -1090,6 +1084,8 @@ nav{
           </p>
         </details>
 
+        </details>
+
         <details>
           <summary>
             Malý tip na závěr
@@ -1201,32 +1197,32 @@ nav{
     // Rok ve footeru
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // univerzální smooth scroll pro všechny odkazy
-document.querySelectorAll('a[href^="#"]').forEach(link => {
+    // Jemné scrollování + „aktivní“ odkaz (bez knihoven)
+    const links = Array.from(document.querySelectorAll('a[href^="#"]:not([href="#"])'));
+    const sections = links
+      .map(a => document.querySelector(a.getAttribute("href")))
+      .filter(Boolean);
 
-  link.addEventListener("click", function(e) {
+    links.forEach(a => {
+  a.addEventListener("click", (e) => {
+    const id = a.getAttribute("href");
+    if (!id) return;
 
-    const hash = this.getAttribute("href");
-    if (!hash || hash === "#") return;
-
-    const target = document.querySelector(hash);
-    if (!target) return;
-
-    e.preventDefault();
-
-    if (hash === "#home") {
+    // Domů = úplně nahoru
+    if (id === "#home") {
+      e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
+      history.pushState(null, "", id);
+      return;
     }
 
-    history.pushState(null, "", hash);
+    const el = document.querySelector(id);
+    if (!el) return;
 
+    e.preventDefault();
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    history.pushState(null, "", id);
   });
-
 });
 
     const setActive = () => {
@@ -1315,27 +1311,28 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   }, { passive: true });
 })();
 
-    // Mobile menu (hamburger) — jen mobilní menu, desktop se nedotkne
+    // Mobile menu (hamburger)
 (() => {
   const burger = document.querySelector('.burger');
   const mm = document.getElementById('mobileMenu');
   if (!burger || !mm) return;
 
   const panel = mm.querySelector('.mm__panel');
-  if (!panel) return;
+  const closeBtn = mm.querySelector('.mm__close');
+  const links = Array.from(mm.querySelectorAll('a[href^="#"]'));
 
-  const mq = window.matchMedia('(max-width: 640px)');
-  if (!mq.matches) return; // desktop 100% beze změny
+  const open = () => {
+  mm.classList.add('is-open');
+  mm.setAttribute('aria-hidden', 'false');
+  burger.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
 
-  const openMenu = () => {
-    mm.classList.add('is-open');
-    mm.setAttribute('aria-hidden', 'false');
-    burger.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-    requestAnimationFrame(() => burger.classList.add('is-open'));
-  };
+  requestAnimationFrame(() => {
+    burger.classList.add('is-open');
+  });
+};
 
-  const closeMenu = () => {
+  const close = () => {
     mm.classList.remove('is-open');
     burger.classList.remove('is-open');
     mm.setAttribute('aria-hidden', 'true');
@@ -1343,88 +1340,67 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     document.body.style.overflow = '';
   };
 
- const scrollToHashSmooth = (hash) => {
+  burger.addEventListener('click', () => {
+  if (mm.classList.contains('is-open')) {
+    close();
+  } else {
+    open();
+  }
+});
+  
+  // klik mimo panel zavře
+  mm.addEventListener('click', (e) => {
+    if (e.target === mm) close();
+  });
 
-  history.pushState(null, '', hash);
+  // swipe zavření (mobil): doprava nebo nahoru
+let startX = 0;
+let startY = 0;
 
-  if (hash === '#home') {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+panel.addEventListener('touchstart', (e) => {
+  const t = e.touches[0];
+  startX = t.clientX;
+  startY = t.clientY;
+}, { passive: true });
+
+panel.addEventListener('touchend', (e) => {
+  const t = e.changedTouches[0];
+  const endX = t.clientX;
+  const endY = t.clientY;
+
+  const dx = endX - startX; // + = doprava
+  const dy = endY - startY; // - = nahoru
+
+  // prahy (klidně pak doladíme)
+  const TH = 60;
+
+  // swipe doprava (zleva doprava)
+  if (dx > TH && Math.abs(dy) < 80) {
+    close();
     return;
   }
 
-  const el = document.querySelector(hash);
-  if (!el) return;
+  // swipe nahoru (zdola nahoru)
+  if (dy < -TH && Math.abs(dx) < 80) {
+    close();
+    return;
+  }
+}, { passive: true });
 
-  el.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
+  // klik na odkaz zavře (a nechá tvůj smooth scroll dál fungovat)
+  links.forEach(a => a.addEventListener('click', () => close()));
 
-};
-
-  burger.addEventListener('click', () => {
-    mm.classList.contains('is-open') ? closeMenu() : openMenu();
-  });
-
-  mm.addEventListener('click', (e) => {
-    if (e.target === mm) closeMenu();
-  });
-
-  // 🔒 pojistka proti double triggeru (touchend + click na iOS)
-  let locking = false;
-
-  const activateLink = (e) => {
-  const target = e.target.nodeType === 3 ? e.target.parentElement : e.target;
-  const a = target.closest('a[href^="#"]');
-  if (!a) return;
-
-    const hash = a.getAttribute('href');
-    if (!hash || hash === '#') return;
-
-    e.preventDefault();
-
-    if (locking) return;
-    locking = true;
-
-    closeMenu();
-
-    setTimeout(() => {
-  requestAnimationFrame(() => {
-    scrollToHashSmooth(hash);
-  });
-  setTimeout(() => { locking = false; }, 250);
-}, 200);
-  };
-
-  // delegace na panel = nejspolehlivější
-  panel.addEventListener('click', activateLink);
-  
+  // ESC zavře
   window.addEventListener('keydown', (e) => {
-    if (mm.classList.contains('is-open') && e.key === 'Escape') closeMenu();
+    if (!mm.classList.contains('is-open')) return;
+    if (e.key === 'Escape') close();
   });
 })();
-    
   </script>
 
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
