@@ -1374,8 +1374,9 @@ nav{
   let locking = false;
 
   const activateLink = (e) => {
-    const a = e.target.closest('a[href^="#"]');
-    if (!a) return;
+  const target = e.target.nodeType === 3 ? e.target.parentElement : e.target;
+  const a = target.closest('a[href^="#"]');
+  if (!a) return;
 
     const hash = a.getAttribute('href');
     if (!hash || hash === '#') return;
@@ -1408,6 +1409,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
