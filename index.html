@@ -116,6 +116,29 @@
     }
     .fb svg{ width:18px; height:18px; opacity:.92; }
 
+    /* Hamburger tlačítko */
+.hamburger{
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  border:1px solid rgba(243,240,234,.16);
+  background:rgba(255,255,255,.02);
+  cursor:pointer;
+  padding:0;
+}
+
+.hamburger span{
+  width:18px;
+  height:2px;
+  background:rgba(243,240,234,.92);
+  display:block;
+  margin:0 auto;
+}
+    
     .top-phone{
       position: absolute;
       left: 80px; /* jak daleko od FB */
@@ -535,6 +558,11 @@
       }
       .gallery{ gap: 10px; }
       .map{ height: 280px; }
+
+      .hamburger{
+    display:flex;
+    margin-left:auto;
+  }
 }
 .quote{
   background: #ffffff;
@@ -563,7 +591,7 @@
   height: 1px;
   background: rgba(17,17,17,.25);
 }
-
+    
 /* Lightbox (klik na fotku v galerii) */
 .lightbox{
   position: fixed;
@@ -1160,5 +1188,6 @@
 </body>
 
 </html>
+
 
 
