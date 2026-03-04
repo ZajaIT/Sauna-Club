@@ -138,6 +138,33 @@
   display:block;
   margin:0 auto;
 }
+
+    /* Mobilní menu – skryté, otevře se přes body.nav-open */
+.topbar nav{
+  position: fixed;
+  top: var(--topbarH);
+  left: 0;
+  right: 0;
+  z-index: 60;
+
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  padding: 14px var(--padX) 18px;
+  gap: 10px;
+
+  background: rgba(7,6,8,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(243,240,234,.12);
+
+  transform: translateY(-110%);
+  transition: transform .22s ease;
+}
+
+body.nav-open .topbar nav{
+  transform: translateY(0);
+}
     
     .top-phone{
       position: absolute;
@@ -1185,11 +1212,25 @@
     }
   }, { passive: true });
 })();
+
+    // Mobilní hamburger menu
+(() => {
+  const burger = document.querySelector(".hamburger");
+  const nav = document.getElementById("mobileNav");
+  if (!burger || !nav) return;
+
+  burger.addEventListener("click", () => {
+    const open = document.body.classList.toggle("nav-open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+    burger.setAttribute("aria-label", open ? "Zavřít menu" : "Otevřít menu");
+  });
+})();
   </script>
 
 </body>
 
 </html>
+
 
 
 
