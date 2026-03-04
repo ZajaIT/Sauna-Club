@@ -1312,28 +1312,27 @@ nav{
   }, { passive: true });
 })();
 
-    // Mobile menu (hamburger)
+    // Mobile menu (hamburger) — MOBILE ONLY, desktop se nedotkne
 (() => {
+  const mq = window.matchMedia('(max-width: 640px)');
+  if (!mq.matches) return;
+
   const burger = document.querySelector('.burger');
   const mm = document.getElementById('mobileMenu');
   if (!burger || !mm) return;
 
   const panel = mm.querySelector('.mm__panel');
-  const closeBtn = mm.querySelector('.mm__close');
-  const links = Array.from(mm.querySelectorAll('a[href^="#"]'));
+  const menuLinks = Array.from(mm.querySelectorAll('a[href^="#"]'));
 
-  const open = () => {
-  mm.classList.add('is-open');
-  mm.setAttribute('aria-hidden', 'false');
-  burger.setAttribute('aria-expanded', 'true');
-  document.body.style.overflow = 'hidden';
+  const openMenu = () => {
+    mm.classList.add('is-open');
+    mm.setAttribute('aria-hidden', 'false');
+    burger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => burger.classList.add('is-open'));
+  };
 
-  requestAnimationFrame(() => {
-    burger.classList.add('is-open');
-  });
-};
-
-  const close = () => {
+  const closeMenu = () => {
     mm.classList.remove('is-open');
     burger.classList.remove('is-open');
     mm.setAttribute('aria-hidden', 'true');
@@ -1341,96 +1340,81 @@ nav{
     document.body.style.overflow = '';
   };
 
+  const scrollToHash = (hash) => {
+    if (hash === '#home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const el = document.querySelector(hash);
+    if (!el) return;
+
+    const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
+    const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  };
+
   burger.addEventListener('click', () => {
-  if (mm.classList.contains('is-open')) {
-    close();
-  } else {
-    open();
-  }
-});
-  
-  // klik mimo panel zavře
-  mm.addEventListener('click', (e) => {
-    if (e.target === mm) close();
+    mm.classList.contains('is-open') ? closeMenu() : openMenu();
   });
 
-  // swipe zavření (mobil): doprava nebo nahoru
-let startX = 0;
-let startY = 0;
+  // Klik mimo panel zavře (overlay)
+  mm.addEventListener('click', (e) => {
+    if (e.target === mm) closeMenu();
+  });
 
-panel.addEventListener('touchstart', (e) => {
-  const t = e.touches[0];
-  startX = t.clientX;
-  startY = t.clientY;
-}, { passive: true });
+  // Klik na položku: nejdřív zavřít, pak scroll (po krátkém odemknutí scrollu)
+  menuLinks.forEach((a) => {
+    a.addEventListener('click', (e) => {
+      const hash = a.getAttribute('href');
+      if (!hash || hash === '#') return;
 
-panel.addEventListener('touchend', (e) => {
-  const t = e.changedTouches[0];
-  const endX = t.clientX;
-  const endY = t.clientY;
+      e.preventDefault();
+      e.stopPropagation();
 
-  const dx = endX - startX; // + = doprava
-  const dy = endY - startY; // - = nahoru
+      closeMenu();
 
-  // prahy (klidně pak doladíme)
-  const TH = 60;
+      setTimeout(() => {
+        scrollToHash(hash);
+        history.pushState(null, '', hash);
+      }, 60);
+    });
+  });
 
-  // swipe doprava (zleva doprava)
-  if (dx > TH && Math.abs(dy) < 80) {
-    close();
-    return;
+  // Swipe zavření
+  if (panel) {
+    let startX = 0;
+    let startY = 0;
+
+    panel.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+    }, { passive: true });
+
+    panel.addEventListener('touchend', (e) => {
+      const t = e.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      const TH = 60;
+
+      if (dx > TH && Math.abs(dy) < 80) closeMenu();
+      if (dy < -TH && Math.abs(dx) < 80) closeMenu();
+    }, { passive: true });
   }
-
-  // swipe nahoru (zdola nahoru)
-  if (dy < -TH && Math.abs(dx) < 80) {
-    close();
-    return;
-  }
-}, { passive: true });
-
-  // klik na odkaz v MOBILE menu: nejdřív zavřít, pak scroll s offsetem topbaru
-const scrollToTarget = (hash) => {
-  if (hash === '#home') {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
-  }
-
-  const el = document.querySelector(hash);
-  if (!el) return;
-
-  const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
-  const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
-
-  window.scrollTo({ top: y, behavior: 'smooth' });
-};
-
-links.forEach(a => a.addEventListener('click', (e) => {
-  const hash = a.getAttribute('href');
-  if (!hash || hash === '#') return;
-
-  e.preventDefault();
-
-  // zavři menu (vrátí overflow)
-  close();
-
-  // počkej malinko, ať mobile browser stihne "odemknout" scroll
-  setTimeout(() => {
-    scrollToTarget(hash);
-    history.pushState(null, '', hash);
-  }, 30);
-}));
 
   // ESC zavře
   window.addEventListener('keydown', (e) => {
-    if (!mm.classList.contains('is-open')) return;
-    if (e.key === 'Escape') close();
+    if (mm.classList.contains('is-open') && e.key === 'Escape') closeMenu();
   });
 })();
+    
   </script>
 
 </body>
 
 </html>
+
 
 
 
