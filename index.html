@@ -623,6 +623,13 @@ nav{
     display: grid;
     align-content: start;
     gap: 10px;
+    transform: translateX(100%);
+    transition: transform .28s ease;
+    will-change: transform;
+  }
+
+    .mm.is-open .mm__panel{
+    transform: translateX(0);
   }
 
   .mm__close{
@@ -1372,6 +1379,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
