@@ -1365,21 +1365,43 @@ nav{
 
   // Klik na položku: nejdřív zavřít, pak scroll (po krátkém odemknutí scrollu)
   menuLinks.forEach((a) => {
-    a.addEventListener('click', (e) => {
-      const hash = a.getAttribute('href');
-      if (!hash || hash === '#') return;
+  a.addEventListener('click', (e) => {
+    const hash = a.getAttribute('href');
+    if (!hash || hash === '#') return;
 
-      e.preventDefault();
-      e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-      closeMenu();
+    // 1) zavřít menu a odemknout scroll
+    closeMenu();
 
-      setTimeout(() => {
-        scrollToHash(hash);
-        history.pushState(null, '', hash);
-      }, 60);
-    });
+    // 2) “tvrdé” nastavení hashe (spolehlivé na mobilech)
+    //    a pak vlastní scroll s offsetem topbaru
+    setTimeout(() => {
+      // nastav hash (nativní anchor navigace)
+      location.hash = hash;
+
+      // a teď to přepočítáme přesně s topbar offsetem
+      if (hash === '#home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      const el = document.querySelector(hash);
+      if (!el) return;
+
+      const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
+      const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
+
+      // dvojité RAF = iOS/Safari často potřebuje “chvíli” po změně hashe
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        });
+      });
+    }, 80);
   });
+});
 
   // Swipe zavření
   if (panel) {
@@ -1414,6 +1436,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
