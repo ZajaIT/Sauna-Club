@@ -1290,12 +1290,15 @@ nav{
   const links = Array.from(mm.querySelectorAll('a[href^="#"]'));
 
   const open = () => {
-    mm.classList.add('is-open');
+  mm.classList.add('is-open');
+  mm.setAttribute('aria-hidden', 'false');
+  burger.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+
+  requestAnimationFrame(() => {
     burger.classList.add('is-open');
-    mm.setAttribute('aria-hidden', 'false');
-    burger.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-  };
+  });
+};
 
   const close = () => {
     mm.classList.remove('is-open');
@@ -1327,6 +1330,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
