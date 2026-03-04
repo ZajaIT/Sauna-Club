@@ -1201,7 +1201,7 @@ nav{
     document.getElementById("year").textContent = new Date().getFullYear();
 
     // Jemné scrollování + „aktivní“ odkaz (bez knihoven)
-    const links = Array.from(document.querySelectorAll('a[href^="#"]:not([href="#"])'));
+    const links = Array.from(document.querySelectorAll('nav a[href^="#"], #mobileMenu a[href^="#"]'));
     const sections = links
       .map(a => document.querySelector(a.getAttribute("href")))
       .filter(Boolean);
@@ -1411,6 +1411,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
