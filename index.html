@@ -1313,7 +1313,7 @@ nav{
   }, { passive: true });
 })();
 
-    // Mobile menu (hamburger) — mobile menu only, desktop se nedotkne
+    // Mobile menu (hamburger) — jen mobilní menu, desktop se nedotkne
 (() => {
   const burger = document.querySelector('.burger');
   const mm = document.getElementById('mobileMenu');
@@ -1321,6 +1321,9 @@ nav{
 
   const panel = mm.querySelector('.mm__panel');
   if (!panel) return;
+
+  const mq = window.matchMedia('(max-width: 640px)');
+  if (!mq.matches) return; // desktop 100% beze změny
 
   const openMenu = () => {
     mm.classList.add('is-open');
@@ -1338,8 +1341,7 @@ nav{
     document.body.style.overflow = '';
   };
 
-  const goToHash = (hash) => {
-    // URL bez skoku
+  const scrollToHashSmooth = (hash) => {
     history.pushState(null, '', hash);
 
     if (hash === '#home') {
@@ -1353,26 +1355,21 @@ nav{
     const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
     const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
 
-    // iOS pojistka: 2× RAF
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      });
-    });
+    window.scrollTo({ top: y, behavior: 'smooth' });
   };
 
-  // burger toggle
   burger.addEventListener('click', () => {
     mm.classList.contains('is-open') ? closeMenu() : openMenu();
   });
 
-  // overlay klik mimo panel zavře
   mm.addEventListener('click', (e) => {
     if (e.target === mm) closeMenu();
   });
 
-  // ✅ nejspolehlivější: poslouchat přímo na panelu (klik i touch)
-  const onPanelActivate = (e) => {
+  // 🔒 pojistka proti double triggeru (touchend + click na iOS)
+  let locking = false;
+
+  const activateLink = (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
 
@@ -1381,39 +1378,29 @@ nav{
 
     e.preventDefault();
 
+    if (locking) return;
+    locking = true;
+
     closeMenu();
 
-    // nech CSS/overflow doběhnout, pak scroll
-    setTimeout(() => goToHash(hash), 120);
+    // počkej chvilku, až se odemkne scroll a doběhne animace
+    setTimeout(() => {
+      scrollToHashSmooth(hash);
+      setTimeout(() => { locking = false; }, 250);
+    }, 120);
   };
 
-  panel.addEventListener('click', onPanelActivate);
-  panel.addEventListener('touchend', onPanelActivate, { passive: false });
+  // delegace na panel = nejspolehlivější
+  panel.addEventListener('click', activateLink);
+  panel.addEventListener('touchend', (e) => {
+    // zabráníme tomu, aby se hned potom odpálil ještě click
+    e.preventDefault();
+    activateLink(e);
+  }, { passive: false });
 
-  // ESC zavře
   window.addEventListener('keydown', (e) => {
     if (mm.classList.contains('is-open') && e.key === 'Escape') closeMenu();
   });
-
-  // swipe zavření zůstává (jak máš)
-  let startX = 0;
-  let startY = 0;
-
-  panel.addEventListener('touchstart', (e) => {
-    const t = e.touches[0];
-    startX = t.clientX;
-    startY = t.clientY;
-  }, { passive: true });
-
-  panel.addEventListener('touchend', (e) => {
-    const t = e.changedTouches[0];
-    const dx = t.clientX - startX;
-    const dy = t.clientY - startY;
-    const TH = 60;
-
-    if (dx > TH && Math.abs(dy) < 80) closeMenu();
-    if (dy < -TH && Math.abs(dx) < 80) closeMenu();
-  }, { passive: true });
 })();
     
   </script>
@@ -1421,6 +1408,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
