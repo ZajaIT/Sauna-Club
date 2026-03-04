@@ -1016,6 +1016,12 @@
   </footer>
 
   <script>
+  // Po reloadu vždy začít nahoře
+  window.addEventListener("load", () => {
+    window.scrollTo(0, 0);
+    history.replaceState(null, "", window.location.pathname);
+  });
+    
     // Rok ve footeru
     document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -1135,4 +1141,5 @@
   </script>
 
 </body>
+
 </html>
