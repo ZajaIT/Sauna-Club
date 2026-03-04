@@ -36,6 +36,10 @@
     }
 
     *{ box-sizing:border-box; }
+
+    html{
+  scroll-behavior: smooth;
+}
     html,body{ height:100%; }
     body{
       margin:0;
@@ -1383,11 +1387,12 @@ nav{
 
     closeMenu();
 
-    // počkej chvilku, až se odemkne scroll a doběhne animace
     setTimeout(() => {
-      scrollToHashSmooth(hash);
-      setTimeout(() => { locking = false; }, 250);
-    }, 120);
+  requestAnimationFrame(() => {
+    scrollToHashSmooth(hash);
+  });
+  setTimeout(() => { locking = false; }, 250);
+}, 200);
   };
 
   // delegace na panel = nejspolehlivější
@@ -1403,6 +1408,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
