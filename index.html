@@ -1200,35 +1200,32 @@ nav{
     // Rok ve footeru
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Jemné scrollování + „aktivní“ odkaz (bez knihoven)
-    const links = Array.from(document.querySelectorAll('nav a[href^="#"], #mobileMenu a[href^="#"]'));
-    const sections = links
-      .map(a => document.querySelector(a.getAttribute("href")))
-      .filter(Boolean);
+    // univerzální smooth scroll pro všechny odkazy
+document.querySelectorAll('a[href^="#"]').forEach(link => {
 
-    links.forEach(a => {
-  a.addEventListener("click", (e) => {
-        // Mobile menu odkazy řešíme zvlášť (kvůli overflow:hidden)
-    if (a.closest('#mobileMenu')) return;
-    
-    const id = a.getAttribute("href");
-    if (!id) return;
+  link.addEventListener("click", function(e) {
 
-    // Domů = úplně nahoru
-    if (id === "#home") {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      history.pushState(null, "", id);
-      return;
-    }
+    const hash = this.getAttribute("href");
+    if (!hash || hash === "#") return;
 
-    const el = document.querySelector(id);
-    if (!el) return;
+    const target = document.querySelector(hash);
+    if (!target) return;
 
     e.preventDefault();
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-    history.pushState(null, "", id);
+
+    if (hash === "#home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+
+    history.pushState(null, "", hash);
+
   });
+
 });
 
     const setActive = () => {
@@ -1411,6 +1408,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
