@@ -673,6 +673,8 @@ nav{
     color: rgba(243,240,234,.92);
     background: rgba(255,255,255,.03);
     border: 1px solid rgba(243,240,234,.10);
+    display: block;
+   -webkit-tap-highlight-color: transparent;
   }
 
   .mm__panel a.is-active{
@@ -1094,8 +1096,6 @@ nav{
           </p>
         </details>
 
-        </details>
-
         <details>
           <summary>
             Malý tip na závěr
@@ -1207,20 +1207,23 @@ nav{
     // Rok ve footeru
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const links = Array.from(document.querySelectorAll(
+    // Kliky řešíme jen pro desktop nav (mobilní menu má svůj vlastní handler níž)
+const navLinks = Array.from(document.querySelectorAll('nav a[href^="#"]:not([href="#"])'));
+
+// Pro zvýraznění aktivní položky chceme oba sety odkazů (nav i mobile menu)
+const allLinks = Array.from(document.querySelectorAll(
   'nav a[href^="#"]:not([href="#"]), #mobileMenu a[href^="#"]:not([href="#"])'
 ));
 
-    const sections = links
+const sections = allLinks
   .map(a => document.querySelector(a.getAttribute("href")))
   .filter(Boolean);
 
-    links.forEach(a => {
+navLinks.forEach(a => {
   a.addEventListener("click", (e) => {
     const id = a.getAttribute("href");
     if (!id) return;
 
-    // Domů = úplně nahoru
     if (id === "#home") {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1236,6 +1239,21 @@ nav{
     history.pushState(null, "", id);
   });
 });
+
+const setActive = () => {
+  const y = window.scrollY + 120;
+  let current = sections[0]?.id || "home";
+  for (const s of sections) {
+    if (s.offsetTop <= y) current = s.id;
+  }
+  allLinks.forEach(a => {
+    const isActive = a.getAttribute("href") === "#" + current;
+    a.classList.toggle("is-active", isActive);
+  });
+};
+
+window.addEventListener("scroll", setActive, { passive: true });
+window.addEventListener("load", setActive);
 
     const setActive = () => {
       const y = window.scrollY + 120; // offset kvůli topbaru
@@ -1434,6 +1452,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
