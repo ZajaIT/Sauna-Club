@@ -644,8 +644,9 @@ nav{
     transform: translateX(100%);
     transition: transform .28s ease;
     will-change: transform;
+    pointer-events: auto;
   }
-
+  
     .mm.is-open .mm__panel{
     transform: translateX(0);
   }
@@ -1312,15 +1313,14 @@ nav{
   }, { passive: true });
 })();
 
-    // Mobile menu (hamburger) — MOBILE ONLY, desktop se nedotkne
+    // Mobile menu (hamburger) — mobile menu only, desktop se nedotkne
 (() => {
-  
   const burger = document.querySelector('.burger');
   const mm = document.getElementById('mobileMenu');
   if (!burger || !mm) return;
 
   const panel = mm.querySelector('.mm__panel');
-  const menuLinks = Array.from(mm.querySelectorAll('a[href^="#"]'));
+  if (!panel) return;
 
   const openMenu = () => {
     mm.classList.add('is-open');
@@ -1338,47 +1338,8 @@ nav{
     document.body.style.overflow = '';
   };
 
-  const scrollToHash = (hash) => {
-    if (hash === '#home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    const el = document.querySelector(hash);
-    if (!el) return;
-
-    const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
-    const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
-    window.scrollTo({ top: y, behavior: 'smooth' });
-  };
-
-  burger.addEventListener('click', () => {
-    mm.classList.contains('is-open') ? closeMenu() : openMenu();
-  });
-
-  // Jediný click handler pro celé mobile menu (delegace) – nejstabilnější na mobilech
-mm.addEventListener('click', (e) => {
-  // 1) klik na overlay mimo panel = zavřít
-  if (e.target === mm) {
-    closeMenu();
-    return;
-  }
-
-  // 2) klik na odkaz v menu
-  const a = e.target.closest('a[href^="#"]');
-  if (!a || !mm.contains(a)) return;
-
-  const hash = a.getAttribute('href');
-  if (!hash || hash === '#') return;
-
-  e.preventDefault();
-
-  // zavřít menu (vrátí overflow)
-  closeMenu();
-
-  // až po zavření/odemknutí scrollu udělat smooth scroll
-  setTimeout(() => {
-    // změň URL bez skoku
+  const goToHash = (hash) => {
+    // URL bez skoku
     history.pushState(null, '', hash);
 
     if (hash === '#home') {
@@ -1392,40 +1353,67 @@ mm.addEventListener('click', (e) => {
     const topbarH = document.querySelector('.topbar')?.offsetHeight || 0;
     const y = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 10;
 
+    // iOS pojistka: 2× RAF
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         window.scrollTo({ top: y, behavior: 'smooth' });
       });
     });
-  }, 120);
-});
+  };
 
-  // Swipe zavření
-  if (panel) {
-    let startX = 0;
-    let startY = 0;
+  // burger toggle
+  burger.addEventListener('click', () => {
+    mm.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
 
-    panel.addEventListener('touchstart', (e) => {
-      const t = e.touches[0];
-      startX = t.clientX;
-      startY = t.clientY;
-    }, { passive: true });
+  // overlay klik mimo panel zavře
+  mm.addEventListener('click', (e) => {
+    if (e.target === mm) closeMenu();
+  });
 
-    panel.addEventListener('touchend', (e) => {
-      const t = e.changedTouches[0];
-      const dx = t.clientX - startX;
-      const dy = t.clientY - startY;
-      const TH = 60;
+  // ✅ nejspolehlivější: poslouchat přímo na panelu (klik i touch)
+  const onPanelActivate = (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
 
-      if (dx > TH && Math.abs(dy) < 80) closeMenu();
-      if (dy < -TH && Math.abs(dx) < 80) closeMenu();
-    }, { passive: true });
-  }
+    const hash = a.getAttribute('href');
+    if (!hash || hash === '#') return;
+
+    e.preventDefault();
+
+    closeMenu();
+
+    // nech CSS/overflow doběhnout, pak scroll
+    setTimeout(() => goToHash(hash), 120);
+  };
+
+  panel.addEventListener('click', onPanelActivate);
+  panel.addEventListener('touchend', onPanelActivate, { passive: false });
 
   // ESC zavře
   window.addEventListener('keydown', (e) => {
     if (mm.classList.contains('is-open') && e.key === 'Escape') closeMenu();
   });
+
+  // swipe zavření zůstává (jak máš)
+  let startX = 0;
+  let startY = 0;
+
+  panel.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+  }, { passive: true });
+
+  panel.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    const TH = 60;
+
+    if (dx > TH && Math.abs(dy) < 80) closeMenu();
+    if (dy < -TH && Math.abs(dx) < 80) closeMenu();
+  }, { passive: true });
 })();
     
   </script>
@@ -1433,6 +1421,7 @@ mm.addEventListener('click', (e) => {
 </body>
 
 </html>
+
 
 
 
