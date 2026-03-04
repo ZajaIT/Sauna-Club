@@ -1392,12 +1392,7 @@ nav{
 
   // delegace na panel = nejspolehlivější
   panel.addEventListener('click', activateLink);
-  panel.addEventListener('touchend', (e) => {
-    // zabráníme tomu, aby se hned potom odpálil ještě click
-    e.preventDefault();
-    activateLink(e);
-  }, { passive: false });
-
+  
   window.addEventListener('keydown', (e) => {
     if (mm.classList.contains('is-open') && e.key === 'Escape') closeMenu();
   });
@@ -1408,6 +1403,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
