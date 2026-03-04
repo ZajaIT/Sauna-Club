@@ -674,6 +674,12 @@ nav{
     background: rgba(255,255,255,.03);
     border: 1px solid rgba(243,240,234,.10);
   }
+
+  .mm__panel a.is-active{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,179,107,.35);
+  box-shadow: inset 0 0 0 1px rgba(255,179,107,.20);
+}
         .topbar{
     z-index: 10050;
   }
@@ -1392,8 +1398,30 @@ panel.addEventListener('touchend', (e) => {
   }
 }, { passive: true });
 
-  // klik na odkaz zavře (a nechá tvůj smooth scroll dál fungovat)
-  links.forEach(a => a.addEventListener('click', () => close()));
+  links.forEach(a => a.addEventListener('click', (e) => {
+  const id = a.getAttribute('href');
+  if (!id || id === '#') return;
+
+  // u mobilního menu si to řídíme sami (kvůli overflow hidden)
+  e.preventDefault();
+
+  // nejdřív zavřít menu (vrátí scroll), pak teprve scrollovat
+  close();
+
+  requestAnimationFrame(() => {
+    if (id === '#home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      history.pushState(null, "", id);
+      return;
+    }
+
+    const el = document.querySelector(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.pushState(null, "", id);
+    }
+  });
+}));
 
   // ESC zavře
   window.addEventListener('keydown', (e) => {
@@ -1406,6 +1434,7 @@ panel.addEventListener('touchend', (e) => {
 </body>
 
 </html>
+
 
 
 
