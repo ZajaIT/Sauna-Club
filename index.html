@@ -811,7 +811,7 @@ nav{
   <!-- MOBILE MENU -->
 <div class="mm" id="mobileMenu" aria-hidden="true">
   <div class="mm__panel" role="dialog" aria-label="Menu">
-    <button class="mm__close" type="button" aria-label="Zavřít menu">×</button>
+   
     <a href="#home">Domů</a>
     <a href="#about">O nás</a>
     <a href="#price">Ceník</a>
@@ -1311,9 +1311,14 @@ nav{
     document.body.style.overflow = '';
   };
 
-  burger.addEventListener('click', open);
-  closeBtn.addEventListener('click', close);
-
+  burger.addEventListener('click', () => {
+  if (mm.classList.contains('is-open')) {
+    close();
+  } else {
+    open();
+  }
+});
+  
   // klik mimo panel zavře
   mm.addEventListener('click', (e) => {
     if (e.target === mm) close();
@@ -1333,6 +1338,7 @@ nav{
 </body>
 
 </html>
+
 
 
 
